@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faSignOutAlt, faUsers, faCog } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '../contexts/AuthContext';
 import AdminOnly from './AdminOnly';
-import './sidebar.css';
+import '../styles/sidebar.css';
 
 const Sidebar: React.FC = () => {
     const { logout, user, isAdmin } = useAuth();

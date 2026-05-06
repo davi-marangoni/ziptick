@@ -2,7 +2,7 @@ import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import './layout.css';
+import '../styles/layout.css';
 
 const Layout: React.FC = () => {
     return (
