@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Nav, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -8,39 +8,53 @@ import AdminOnly from './AdminOnly';
 import '../styles/sidebar.css';
 
 const Sidebar: React.FC = () => {
-    const { logout, user, isAdmin } = useAuth();
+    const { logout } = useAuth();
+    const [isExpanded, setIsExpanded] = useState(false);
 
     return (
-        <nav className="sidebar">
+        <nav
+            className={`sidebar ${isExpanded ? 'expanded' : 'collapsed'}`}
+            onMouseEnter={() => setIsExpanded(true)}
+            onMouseLeave={() => setIsExpanded(false)}
+        >
             <div className="sidebar-header">
-                <h3>ZipTick</h3>
-                {user && <p className="user-email">{user.email}</p>}
+                <h3>{isExpanded ? 'ZipTick' : 'Z'}</h3>
             </div>
 
             <Nav className="flex-column nav-links">
-                <Nav.Link as={Link} to="/" className="nav-item">
-                    <FontAwesomeIcon icon={faHome} /> Dashboard
+                <Nav.Link as={Link} to="/" className="nav-item" title="Dashboard">
+                    <span className="nav-icon">
+                        <FontAwesomeIcon icon={faHome} />
+                    </span>
+                    <span className="nav-label">Dashboard</span>
                 </Nav.Link>
 
                 <AdminOnly>
-                    <Nav.Link as={Link} to="/usuarios" className="nav-item">
-                        <FontAwesomeIcon icon={faUsers} /> Usuários
+                    <Nav.Link as={Link} to="/usuarios" className="nav-item" title="Usuários">
+                        <span className="nav-icon">
+                            <FontAwesomeIcon icon={faUsers} />
+                        </span>
+                        <span className="nav-label">Usuários</span>
                     </Nav.Link>
                 </AdminOnly>
 
-                <Nav.Link as={Link} to="/configuracoes" className="nav-item">
-                    <FontAwesomeIcon icon={faCog} /> Configurações
+                <Nav.Link as={Link} to="/configuracoes" className="nav-item" title="Configurações">
+                    <span className="nav-icon">
+                        <FontAwesomeIcon icon={faCog} />
+                    </span>
+                    <span className="nav-label">Configurações</span>
                 </Nav.Link>
             </Nav>
 
             <div className="sidebar-footer">
                 <Button
                     variant="danger"
-                    size="sm"
                     onClick={logout}
-                    className="logout-btn w-100"
+                    className="logout-btn"
+                    title="Sair"
                 >
-                    <FontAwesomeIcon icon={faSignOutAlt} /> Sair
+                    <FontAwesomeIcon icon={faSignOutAlt} />
+                    {isExpanded && <span className="btn-label">Sair</span>}
                 </Button>
             </div>
         </nav>
