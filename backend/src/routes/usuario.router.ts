@@ -11,6 +11,10 @@ router.post('/login', async (req: Request, res: Response) => {
     await usuarioController.login(req, res);
 });
 
+router.post('/register-publico', async (req: Request, res: Response) => {
+    await usuarioController.registerPublico(req, res);
+});
+
 // Rotas protegidas para administradores (tipo 1)
 router.get('/',
     authMiddleware.authenticate,
@@ -41,6 +45,14 @@ router.put('/:email/senha',
     authMiddleware.authorizeAdmin,
     async (req: Request, res: Response) => {
         await usuarioController.updateSenhaUsuario(req, res);
+    }
+);
+
+router.patch('/:email/perfil',
+    authMiddleware.authenticate,
+    authMiddleware.authorizeAll,
+    async (req: Request, res: Response) => {
+        await usuarioController.updatePerfil(req, res);
     }
 );
 

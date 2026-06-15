@@ -4,107 +4,137 @@ import bcrypt from 'bcryptjs';
 
 export class UsuarioService {
 
-    /**
-     * Busca todos os usuários do sistema
-     */
-    public async getUsuarios(): Promise<Usuario[]> {
+    public async getUsuarios(): Promise<Omit<Usuario, 'senha'>[]> {
         try {
-            const usuarios = await db.any('SELECT usua_email as email, usua_tipo_usuario as tipo FROM usua_usuario');
-            return usuarios;
+            return await db.any(
+                `SELECT u.usua_email         AS email,
+                        u.usua_nome          AS nome,
+                        u.usua_tipo_usuario  AS tipo,
+                        u.usua_cargo         AS cargo,
+                        u.usua_criado_em     AS criado_em,
+                        s.seto_id            AS seto_id,
+                        s.seto_nome          AS setor_nome
+                 FROM usua_usuario u
+                 LEFT JOIN seto_setor s ON s.seto_id = u.usua_seto_id
+                 ORDER BY u.usua_criado_em DESC`
+            );
         } catch (error) {
             throw new Error(`Erro ao buscar usuários: ${error}`);
         }
     }
 
-    /**
-     * Busca um usuário pelo email
-     */
     public async getUsuarioByEmail(email: string): Promise<Usuario | null> {
         try {
-            const usuario = await db.oneOrNone(
-                'SELECT usua_email as email, usua_senha as senha, usua_tipo_usuario as tipo FROM usua_usuario WHERE usua_email = $1',
+            return await db.oneOrNone(
+                `SELECT usua_email       AS email,
+                        usua_senha       AS senha,
+                        usua_nome        AS nome,
+                        usua_tipo_usuario AS tipo,
+                        usua_ip_criacao  AS ip_criacao,
+                        usua_criado_em   AS criado_em,
+                        usua_aceitou_termos AS aceitou_termos,
+                        usua_seto_id     AS seto_id,
+                        usua_cargo       AS cargo
+                 FROM usua_usuario WHERE usua_email = $1`,
                 [email]
             );
-            return usuario;
         } catch (error) {
             throw new Error(`Erro ao buscar usuário por email: ${error}`);
         }
     }
 
-    /**
-     * Cria um novo usuário no sistema
-     * Verifica se o email já existe e criptografa a senha com bcrypt
-     */
-    public async createUsuario(dadosUsuario: Usuario): Promise<Omit<Usuario, 'senha'>> {
+    public async createUsuario(dados: Partial<Usuario> & { email: string; senha: string; tipo: number }): Promise<Omit<Usuario, 'senha'>> {
         try {
-            const { email, senha, tipo } = dadosUsuario;
+            const existente = await this.getUsuarioByEmail(dados.email);
+            if (existente) throw new Error('Email já cadastrado no sistema');
 
-            // Verifica se o email já existe
-            const usuarioExistente = await this.getUsuarioByEmail(email);
-            if (usuarioExistente) {
-                throw new Error('Email já cadastrado no sistema');
-            }
+            const senhaCriptografada = await bcrypt.hash(dados.senha, 12);
 
-            // Criptografa a senha com bcrypt
-            const saltRounds = 12;
-            const senhaCriptografada = await bcrypt.hash(senha, saltRounds);
-
-            // Insere o novo usuário no banco
-            const novoUsuario = await db.one(
-                'INSERT INTO usua_usuario (usua_email, usua_senha, usua_tipo_usuario) VALUES ($1, $2, $3) RETURNING usua_email as email, usua_tipo_usuario as tipo',
-                [email, senhaCriptografada, tipo]
+            return await db.one(
+                `INSERT INTO usua_usuario
+                    (usua_email, usua_senha, usua_tipo_usuario, usua_nome, usua_ip_criacao,
+                     usua_criado_em, usua_seto_id, usua_cargo)
+                 VALUES ($1, $2, $3, $4, $5, NOW(), $6, $7)
+                 RETURNING
+                    usua_email       AS email,
+                    usua_nome        AS nome,
+                    usua_tipo_usuario AS tipo,
+                    usua_cargo       AS cargo,
+                    usua_criado_em   AS criado_em`,
+                [dados.email, senhaCriptografada, dados.tipo, dados.nome || null,
+                 dados.ip_criacao || null, dados.seto_id || null, dados.cargo || null]
             );
-
-            return novoUsuario;
         } catch (error) {
-            if (error instanceof Error) {
-                throw error;
-            }
+            if (error instanceof Error) throw error;
             throw new Error(`Erro ao criar usuário: ${error}`);
         }
     }
 
-    /**
-     * Atualiza apenas a senha do usuário
-     */
+    public async createUsuarioPublico(dados: {
+        email: string;
+        senha: string;
+        nome: string;
+        aceitou_termos: boolean;
+        ip_criacao?: string;
+    }): Promise<Omit<Usuario, 'senha'>> {
+        if (!dados.aceitou_termos) {
+            throw new Error('É necessário aceitar os termos de uso para se cadastrar');
+        }
+
+        const existente = await this.getUsuarioByEmail(dados.email);
+        if (existente) throw new Error('Email já cadastrado no sistema');
+
+        const senhaCriptografada = await bcrypt.hash(dados.senha, 12);
+
+        return db.one(
+            `INSERT INTO usua_usuario
+                (usua_email, usua_senha, usua_tipo_usuario, usua_nome,
+                 usua_ip_criacao, usua_criado_em, usua_aceitou_termos)
+             VALUES ($1, $2, 4, $3, $4, NOW(), TRUE)
+             RETURNING
+                usua_email        AS email,
+                usua_nome         AS nome,
+                usua_tipo_usuario AS tipo,
+                usua_criado_em    AS criado_em`,
+            [dados.email, senhaCriptografada, dados.nome, dados.ip_criacao || null]
+        );
+    }
+
+    public async updatePerfil(email: string, dados: { telegram_id?: string; whatsapp?: string }): Promise<void> {
+        const sets: string[] = [];
+        const params: any[] = [];
+        let p = 1;
+        if (dados.telegram_id !== undefined) { sets.push(`usua_telegram_id = $${p++}`); params.push(dados.telegram_id || null); }
+        if (dados.whatsapp !== undefined)    { sets.push(`usua_whatsapp = $${p++}`);     params.push(dados.whatsapp || null); }
+        if (!sets.length) return;
+        params.push(email);
+        await db.none(`UPDATE usua_usuario SET ${sets.join(', ')} WHERE usua_email = $${p}`, params);
+    }
+
     public async updateSenhaUsuario(email: string, novaSenha: string): Promise<void> {
         try {
-            const usuarioExistente = await this.getUsuarioByEmail(email);
-            if (!usuarioExistente) {
-                throw new Error('Usuário não encontrado');
-            }
+            const existente = await this.getUsuarioByEmail(email);
+            if (!existente) throw new Error('Usuário não encontrado');
 
-            // Criptografa a nova senha com bcrypt
-            const saltRounds = 12;
-            const senhaCriptografada = await bcrypt.hash(novaSenha, saltRounds);
-
+            const senhaCriptografada = await bcrypt.hash(novaSenha, 12);
             await db.none(
                 'UPDATE usua_usuario SET usua_senha = $1 WHERE usua_email = $2',
                 [senhaCriptografada, email]
             );
         } catch (error) {
-            if (error instanceof Error) {
-                throw error;
-            }
+            if (error instanceof Error) throw error;
             throw new Error(`Erro ao atualizar senha: ${error}`);
         }
     }
 
-    /**
-     * Remove um usuário do sistema
-     */
     public async deleteUsuario(email: string): Promise<void> {
         try {
-            const usuarioExistente = await this.getUsuarioByEmail(email);
-            if (!usuarioExistente) {
-                throw new Error('Usuário não encontrado');
-            }
+            const existente = await this.getUsuarioByEmail(email);
+            if (!existente) throw new Error('Usuário não encontrado');
 
             await db.none('DELETE FROM usua_usuario WHERE usua_email = $1', [email]);
         } catch (error) {
-            if (error instanceof Error) {
-                throw error;
-            }
+            if (error instanceof Error) throw error;
             throw new Error(`Erro ao deletar usuário: ${error}`);
         }
     }
