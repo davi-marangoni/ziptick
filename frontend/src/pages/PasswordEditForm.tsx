@@ -3,6 +3,8 @@ import { Container, Form, Button, Alert } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+const apiUrl = import.meta.env.VITE_API_URL;
+
 const PasswordEditForm: React.FC = () => {
     const { email } = useParams<{ email: string }>();
     const [novaSenha, setNovaSenha] = useState('');
@@ -30,7 +32,7 @@ const PasswordEditForm: React.FC = () => {
         setLoading(true);
 
         try {
-            await axios.put(`http://localhost:3000/api/usuarios/${email}/senha`, {
+            await axios.put(`${apiUrl}/api/usuarios/${email}/senha`, {
                 novaSenha
             });
             setSuccess('Senha atualizada com sucesso!');

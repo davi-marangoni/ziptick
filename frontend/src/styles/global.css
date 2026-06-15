@@ -1,18 +1,50 @@
-* {
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root {
+    --bg: #f4f4f5;
+    --card: #ffffff;
+    --border: #e5e7eb;
+    --text: #111111;
+    --text-muted: #6b7280;
+    --text-light: #9ca3af;
+    --primary: #111111;
+    --primary-hover: #2d2d2d;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.07), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    --shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.1);
+
+    /* Status colours */
+    --col-orange: #f97316;
+    --col-blue: #3b82f6;
+    --col-amber: #f59e0b;
+    --col-green: #22c55e;
+    --col-purple: #8b5cf6;
+    --col-cyan: #06b6d4;
+    --col-gray: #9ca3af;
+}
+
+/* ============================================================
+   RESET
+   ============================================================ */
+*, *::before, *::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f5f5f5;
-    color: #333;
-}
-
 html, body, #root {
     height: 100%;
     width: 100%;
+}
+
+body {
+    font-family: Inter, 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 a {
@@ -28,82 +60,161 @@ button {
     cursor: pointer;
 }
 
-.container {
-    padding: 20px;
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.4px; }
+h2 { font-size: 18px; font-weight: 650; }
+h3 { font-size: 16px; font-weight: 600; }
+
+/* ============================================================
+   BOOTSTRAP OVERRIDES
+   ============================================================ */
+
+/* Buttons */
+.btn {
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    font-size: 13.5px;
+    transition: opacity 0.15s, transform 0.1s;
+    border: none;
 }
 
-/* Alertas */
-.alert {
-    border-radius: 4px;
-    margin-bottom: 20px;
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: none;
 }
 
-/* Tabelas */
-.table {
-    background-color: white;
-    border-radius: 4px;
+.btn:active {
+    transform: translateY(0);
 }
 
-.table thead th {
-    background-color: #f8f9fa;
-    border-top: none;
-    font-weight: 600;
+.btn-primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+    color: #fff;
+}
+
+.btn-outline-secondary {
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    background: transparent;
+}
+
+.btn-outline-secondary:hover {
+    background: var(--bg);
+    border-color: #d1d5db;
+    color: var(--text);
+}
+
+.btn-danger {
+    background: #dc2626;
+    border-color: #dc2626;
+}
+
+/* Forms */
+.form-control,
+.form-select {
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--text);
+    background: #fff;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #a0a0a0;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.07);
+    outline: none;
+}
+
+.form-label {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 5px;
 }
 
 /* Cards */
 .card {
     border: none;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 4px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    background: var(--card);
 }
 
-/* Formulários */
-.form-control,
-.form-select {
-    border-radius: 4px;
-    border: 1px solid #ddd;
+/* Tables */
+.table {
+    background: var(--card);
+    border-radius: var(--radius);
+    font-size: 14px;
 }
 
-.form-control:focus,
-.form-select:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+.table thead th {
+    background: var(--bg);
+    border-top: none;
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
 }
 
-/* Botões */
-.btn {
-    border-radius: 4px;
+.table td {
+    border-color: var(--border);
+    vertical-align: middle;
+}
+
+/* Alerts */
+.alert {
+    border-radius: var(--radius-sm);
+    border: none;
+    font-size: 14px;
+}
+
+/* Badge */
+.badge {
+    border-radius: 5px;
     font-weight: 500;
-    transition: all 0.3s ease;
+    font-size: 11px;
 }
 
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+/* Modal */
+.modal-content {
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.16);
 }
 
-.btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
+.modal-header {
+    border-bottom: 1px solid var(--border);
+    padding: 18px 22px 14px;
 }
 
-.btn-success {
-    background-color: #28a745;
-    border-color: #28a745;
+.modal-body {
+    padding: 20px 22px;
 }
 
-.btn-warning {
-    background-color: #ffc107;
-    border-color: #ffc107;
-    color: #333;
+.modal-footer {
+    border-top: 1px solid var(--border);
+    padding: 14px 22px 18px;
 }
 
-.btn-danger {
-    background-color: #dc3545;
-    border-color: #dc3545;
+.modal-title {
+    font-weight: 650;
+    font-size: 16px;
 }
 
-.btn-secondary {
-    background-color: #6c757d;
-    border-color: #6c757d;
+/* Spinner */
+.spinner-border {
+    color: var(--primary);
 }

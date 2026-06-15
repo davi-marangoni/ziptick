@@ -1,27 +1,17 @@
-.layout {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    background-color: #f5f5f5;
-    overflow: hidden;
-    margin-left: 80px;
-    transition: margin-left 0.3s ease;
-}
-
 .main-content {
-    padding: 30px;
-    flex: 1;
-    overflow-y: auto;
+    padding-top: 56px; /* height of fixed AppHeader */
+    min-height: 100vh;
+    background: var(--bg);
 }
 
-/* Responsividade */
+/* Inner content padding (pages use this) */
+.page-inner {
+    padding: 28px 32px;
+    max-width: 1400px;
+}
+
 @media (max-width: 768px) {
-    .layout {
-        margin-left: 0;
-    }
-
-    .main-content {
-        padding: 20px;
+    .page-inner {
+        padding: 20px 16px;
     }
 }
-

@@ -3,6 +3,9 @@ import { Container, Table, Button, Alert } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
+
+const apiUrl = import.meta.env.VITE_API_URL;
+
 interface Usuario {
     email: string;
     tipo: number;
@@ -19,7 +22,7 @@ const Users: React.FC = () => {
 
     const fetchUsuarios = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/api/usuarios');
+            const response = await axios.get(`${apiUrl}/api/usuarios`);
             setUsuarios(response.data.data);
         } catch (err: any) {
             setError(err.response?.data?.message || 'Erro ao buscar usuários');
@@ -32,7 +35,7 @@ const Users: React.FC = () => {
         if (!window.confirm('Tem certeza que deseja deletar este usuário?')) return;
 
         try {
-            await axios.delete(`http://localhost:3000/api/usuarios/${email}`);
+            await axios.delete(`${apiUrl}/api/usuarios/${email}`);
             setUsuarios(usuarios.filter(u => u.email !== email));
         } catch (err: any) {
             setError(err.response?.data?.message || 'Erro ao deletar usuário');

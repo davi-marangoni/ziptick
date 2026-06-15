@@ -1,6 +1,7 @@
 import axios from 'axios';
-
-const API_BASE_URL = 'http://localhost:3000/api';
+// Em produção (Docker) VITE_API_URL não é definido → '' → URLs relativas → Nginx proxia
+// Em dev VITE_API_URL=http://localhost:3003 via proxy do Vite dev server
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? '';
 
 const api = axios.create({
     baseURL: API_BASE_URL
@@ -17,22 +18,34 @@ api.interceptors.request.use((config) => {
 
 export const usuarioService = {
     login: (email: string, senha: string) =>
-        api.post('/usuarios/login', { email, senha }),
+        api.post('api/usuarios/login', { email, senha }),
 
     getUsuarios: () =>
-        api.get('/usuarios'),
+        api.get('api/usuarios'),
 
     getUsuarioByEmail: (email: string) =>
-        api.get(`/usuarios/${email}`),
+        api.get(`api/usuarios/${email}`),
 
-    createUsuario: (email: string, senha: string, tipo: number) =>
-        api.post('/usuarios/register', { email, senha, tipo }),
+    createUsuario: (email: string, senha: string, tipo: number, nome?: string, seto_id?: number, cargo?: string) =>
+        api.post('api/usuarios/register', { email, senha, tipo, nome, seto_id, cargo }),
+
+    cadastrarPublico: (email: string, senha: string, nome: string, aceitou_termos: boolean) =>
+        api.post('api/usuarios/register-publico', { email, senha, nome, aceitou_termos }),
+
+    esqueciSenha: (email: string) =>
+        api.post('api/auth/esqueci-senha', { email }),
+
+    redefinirSenha: (token: string, novaSenha: string) =>
+        api.post('api/auth/redefinir-senha', { token, novaSenha }),
 
     updateSenha: (email: string, novaSenha: string) =>
-        api.put(`/usuarios/${email}/senha`, { novaSenha }),
+        api.put(`api/usuarios/${email}/senha`, { novaSenha }),
 
     deleteUsuario: (email: string) =>
-        api.delete(`/usuarios/${email}`)
+        api.delete(`api/usuarios/${email}`),
+
+    atualizarPerfil: (email: string, dados: { telegram_id?: string; whatsapp?: string }) =>
+        api.patch(`api/usuarios/${email}/perfil`, dados),
 };
 
 export default api;
