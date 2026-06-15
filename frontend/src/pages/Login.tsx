@@ -1,8 +1,17 @@
 import React, { useState } from 'react';
-import { Container, Form, Button, Card, Alert } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import '../styles/login.css';
+
+const GridIcon = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <rect x="1" y="1" width="9" height="9" rx="2" fill="white" fillOpacity="0.85" />
+        <rect x="14" y="1" width="9" height="9" rx="2" fill="white" fillOpacity="0.85" />
+        <rect x="1" y="14" width="9" height="9" rx="2" fill="white" fillOpacity="0.85" />
+        <rect x="14" y="14" width="9" height="9" rx="2" fill="white" fillOpacity="0.4" />
+    </svg>
+);
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -16,62 +25,67 @@ const Login: React.FC = () => {
         e.preventDefault();
         setError('');
         setLoading(true);
-
         try {
             await login(email, senha);
             navigate('/');
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Erro ao fazer login');
+            setError(err.response?.data?.message || 'E-mail ou senha incorretos');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <Container fluid className="login-container">
-            <div className="login-wrapper">
-                <Card className="login-card">
-                    <Card.Body>
-                        <h1 className="text-center mb-4">ZipTick</h1>
+        <div className="login-page">
+            <div className="login-box">
+                <div className="login-logo">
+                    <div className="login-logo-icon"><GridIcon /></div>
+                    <span className="login-logo-name">ZipTick</span>
+                    <span className="login-logo-tagline">Atendimento transparente, do chamado à resolução</span>
+                </div>
+                <div className="login-card">
+                    <h2>Entrar</h2>
 
-                        {error && <Alert variant="danger">{error}</Alert>}
+                    {error && (
+                        <div className="login-error">{error}</div>
+                    )}
 
-                        <Form onSubmit={handleSubmit}>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Email</Form.Label>
-                                <Form.Control
-                                    type="email"
-                                    placeholder="Seu email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    required
-                                />
-                            </Form.Group>
+                    <Form onSubmit={handleSubmit}>
+                        <Form.Group className="mb-3">
+                            <Form.Label>E-mail</Form.Label>
+                            <Form.Control
+                                type="email"
+                                placeholder="seu@email.com"
+                                value={email}
+                                onChange={e => setEmail(e.target.value)}
+                                required
+                                autoFocus
+                            />
+                        </Form.Group>
 
-                            <Form.Group className="mb-3">
-                                <Form.Label>Senha</Form.Label>
-                                <Form.Control
-                                    type="password"
-                                    placeholder="Sua senha"
-                                    value={senha}
-                                    onChange={(e) => setSenha(e.target.value)}
-                                    required
-                                />
-                            </Form.Group>
+                        <Form.Group className="mb-4">
+                            <Form.Label>Senha</Form.Label>
+                            <Form.Control
+                                type="password"
+                                placeholder="••••••••"
+                                value={senha}
+                                onChange={e => setSenha(e.target.value)}
+                                required
+                            />
+                        </Form.Group>
 
-                            <Button
-                                variant="primary"
-                                type="submit"
-                                className="w-100"
-                                disabled={loading}
-                            >
-                                {loading ? 'Entrando...' : 'Entrar'}
-                            </Button>
-                        </Form>
-                    </Card.Body>
-                </Card>
+                        <button type="submit" className="login-btn" disabled={loading}>
+                            {loading ? 'Entrando...' : 'Entrar'}
+                        </button>
+                    </Form>
+                </div>
+
+                <div className="login-links">
+                    <a href="/esqueci-senha">Esqueci minha senha</a>
+                    <a href="/cadastro">Não tem conta? Cadastre-se</a>
+                </div>
             </div>
-        </Container>
+        </div>
     );
 };
 

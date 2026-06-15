@@ -1,9 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
+const apiUrl = import.meta.env.VITE_API_URL;
 export interface User {
     email: string;
     tipo: number;
+    nome?: string;
 }
 
 interface AuthContextType {
@@ -13,6 +15,8 @@ interface AuthContextType {
     logout: () => void;
     isAuthenticated: boolean;
     isAdmin: boolean;
+    isGerencia: boolean;
+    isFuncionario: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,7 +43,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const login = async (email: string, senha: string): Promise<void> => {
         try {
-            const response = await axios.post('http://localhost:3000/api/usuarios/login', {
+            const response = await axios.post(`${apiUrl}/api/usuarios/login`, {
                 email,
                 senha
             });
@@ -80,7 +84,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 login,
                 logout,
                 isAuthenticated: !!token,
-                isAdmin: user?.tipo === 1
+                isAdmin: user?.tipo === 1,
+                isGerencia: (user?.tipo ?? 99) <= 2,
+                isFuncionario: (user?.tipo ?? 99) <= 3,
             }}
         >
             {children}
