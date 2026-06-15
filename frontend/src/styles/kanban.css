@@ -1,0 +1,410 @@
+/* ============================================================
+   KANBAN BOARD
+   ============================================================ */
+
+.kanban-page {
+    height: calc(100vh - 56px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.kanban-loading {
+    height: calc(100vh - 56px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Title bar */
+.kanban-title-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 28px 14px;
+    flex-shrink: 0;
+}
+
+.kanban-title {
+    font-size: 21px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.4px;
+    margin: 0;
+}
+
+.kanban-subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 3px 0 0;
+}
+
+.kanban-count {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+/* ── Board layout ── */
+.kanban-board {
+    display: flex;
+    gap: 14px;
+    padding: 0 28px 24px;
+    overflow-x: auto;
+    flex: 1;
+    align-items: flex-start;
+}
+
+.kanban-board::-webkit-scrollbar {
+    height: 6px;
+}
+
+.kanban-board::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.kanban-board::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.12);
+    border-radius: 3px;
+}
+
+.kanban-board::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.28);
+}
+
+/* ── Admin: sector-box layout ── */
+.kanban-board.admin-sectors {
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+    align-items: stretch;
+    gap: 16px;
+}
+
+.kb-sector-box {
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.kb-sector-box-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 18px;
+}
+
+.kb-sector-box-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.kb-sector-box-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    flex: 1;
+    letter-spacing: -0.2px;
+}
+
+.kb-sector-box-count {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.kb-sector-columns {
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px 16px;
+    overflow-x: auto;
+    align-items: flex-start;
+}
+
+.kb-sector-columns::-webkit-scrollbar {
+    height: 5px;
+}
+
+.kb-sector-columns::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.kb-sector-columns::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.10);
+    border-radius: 3px;
+}
+
+.kb-sector-columns::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.26);
+}
+
+.kb-sector-empty {
+    color: var(--text-light);
+    font-size: 13px;
+    padding: 24px 8px;
+    text-align: center;
+    width: 100%;
+}
+
+/* ── Column ── */
+.kb-column {
+    min-width: 270px;
+    max-width: 270px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* Column header */
+.kb-col-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 4px 4px;
+}
+
+.kb-col-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.kb-col-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text);
+    flex: 1;
+}
+
+.kb-col-count {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: var(--border);
+    border-radius: 5px;
+    padding: 1px 7px;
+}
+
+/* Agrupamento título + label de setor (visível na view admin) */
+.kb-col-title-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 1px;
+}
+
+.kb-col-sector-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ── Drop zone ── */
+.kb-drop-zone {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 100px;
+    border-radius: 10px;
+    padding: 6px;
+    transition: background 0.15s;
+}
+
+.kb-drop-zone.over {
+    background: rgba(59, 130, 246, 0.06);
+    outline: 2px dashed rgba(59, 130, 246, 0.3);
+    outline-offset: -2px;
+}
+
+.kb-empty {
+    color: var(--text-light);
+    font-size: 12.5px;
+    text-align: center;
+    padding: 20px 8px;
+    border: 1.5px dashed var(--border);
+    border-radius: 8px;
+    margin: 2px 0;
+}
+
+/* ── Card ── */
+.kb-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: var(--shadow-card);
+    padding: 12px 14px;
+    cursor: grab;
+    transition: box-shadow 0.15s;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.kb-card:hover {
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+}
+
+.kb-card.dragging {
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.16);
+    cursor: grabbing;
+}
+
+/* Card top row: ID + sector tag */
+.kb-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+.kb-card-id {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #3b82f6;
+    letter-spacing: 0.3px;
+    text-decoration: none;
+}
+
+.kb-card-id:hover {
+    text-decoration: underline;
+    color: #2563eb;
+}
+
+.kb-card-sector {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 7px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 90px;
+}
+
+/* Title */
+.kb-card-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.35;
+    text-decoration: none;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.kb-card-title:hover {
+    color: var(--text);
+}
+
+/* Description */
+.kb-card-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.45;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Footer: assignee + time */
+.kb-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 2px;
+}
+
+.kb-card-assignee {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+}
+
+.kb-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    color: #374151;
+    font-size: 9px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    letter-spacing: 0.3px;
+}
+
+.kb-assignee-name {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 110px;
+}
+
+.kb-card-time {
+    font-size: 11px;
+    color: var(--text-light);
+    white-space: nowrap;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.kb-card-time::before {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='7' stroke='%239ca3af' stroke-width='1.5' fill='none'/%3E%3Cpath d='M8 4v4l2.5 2.5' stroke='%239ca3af' stroke-width='1.5' stroke-linecap='round' fill='none'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    flex-shrink: 0;
+}
+
+/* ── Modal file drop area ── */
+.kb-file-drop {
+    border: 1.5px dashed var(--border);
+    border-radius: 8px;
+    padding: 18px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13.5px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.kb-file-drop:hover {
+    background: var(--bg);
+    border-color: #a0a0a0;
+}
+
+.kb-file-icon {
+    font-size: 16px;
+}
